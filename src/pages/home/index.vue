@@ -17,10 +17,7 @@
 
       <view class="content">
         <view v-if="current === 0">
-          <home-recommend
-            :date="DD"
-            :month="MM"
-          ></home-recommend>
+          <home-recommend :date="DD" :month="MM" :scrollTop="scrollTop"></home-recommend>
         </view>
         <view v-if="current === 1">
           <home-category>分类</home-category>
@@ -58,8 +55,10 @@ export default {
       // tab选中索引
       current: 0,
       // 转换后的时间，在组件内传值会有延时
-      DD: '',
-      MM: '',
+      DD: "",
+      MM: "",
+      // 顶部距离
+      scrollTop:0
     };
   },
   onLoad() {
@@ -75,6 +74,12 @@ export default {
       }
     },
   },
+  onPageScroll({ scrollTop }) {
+    // 传入scrollTop值并触发所有easy-loadimage组件下的滚动监听事件
+    this.scrollTop = scrollTop;
+    // console.log("滚动事件", getApp().globalData.scrollTop);
+  },
+  
 };
 </script>
 
