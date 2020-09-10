@@ -8,7 +8,7 @@ const request = (config) => {
   uni.showToast({
     //请求数据时的loading
     title: "加载中",
-    duration: 2000,
+    // duration: 2000,
     icon: "loading",
   });
   let promise = new Promise(function(resolve, reject) {
