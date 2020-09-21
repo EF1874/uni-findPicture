@@ -1,15 +1,18 @@
 const request = (config) => {
   // 处理 apiUrl
-  config.url = "http://157.122.54.189:9088/image/" + config.url;
+  if (config.url.indexOf("http") === -1) {
+    config.url = "http://157.122.54.189:9088/image/" + config.url;
+  }
   if (!config.data) {
     config.data = {};
   }
   console.log(JSON.stringify(config.data));
   uni.showToast({
     //请求数据时的loading
-    title: "加载中",
+    title: "",
     // duration: 2000,
     icon: "loading",
+    mask: true,
   });
   let promise = new Promise(function(resolve, reject) {
     uni.request(config).then((responses) => {
@@ -30,12 +33,13 @@ const request = (config) => {
           duration: 20000,
         });
       } else {
-        uni.showToast({
-          //请求数据时的loading
-          title: "加载成功！",
-          duration: 2000,
-          icon: "success",
-        });
+        // uni.showToast({
+        //   //请求数据时的loading
+        //   title: "加载成功！",
+        //   duration: 2000,
+        //   icon: "success",
+        // });
+        uni.hideToast();
         let { res } = responses[1].data; // 如果返回的结果是data.data的，嫌麻烦可以用这个，return res,这样只返回一个data
         resolve(res);
       }

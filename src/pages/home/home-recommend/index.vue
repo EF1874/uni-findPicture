@@ -20,9 +20,9 @@
     <!-- 每日推荐区域 -->
     <view class="home_moment">
       <!-- 标题 -->
-      <view class="moment_title">
-        <view class="moment_title_text">
-          <view class="moment_title_date"
+      <view class="moment_title_content">
+        <view class="moment_title_date">
+          <view class="moment_title_month"
             >{{ date.DD }}/<text>{{ date.MM }}月</text></view
           >
           <view class="moment_title">永远年轻 永远热泪盈眶</view>
@@ -35,13 +35,13 @@
           <easy-loadimage
             mode="widthFix"
             :scroll-top="scrollTop"
-            :image-src="item.thumb + item.rule.replace('$<Height>', 360)"
+            :image-src="item.thumb + item.rule.replace('$<Height>', 240)"
           ></easy-loadimage>
           <!-- <text>{{ item.tag[index] }}</text> -->
         </view>
       </view>
     </view>
-    <!-- 热门 -->
+    <!-- 热门推荐区 -->
     <view class="vertical">
       <view class="vertical_title">热门</view>
       <view class="vertical_content">
@@ -51,9 +51,10 @@
           :key="item.id"
         >
           <easy-loadimage
-            mode="widthFix"
+            mode="heightFix"
             :scroll-top="scrollTop"
             :image-src="item.thumb"
+            loading-mode="spin-circle looming-gray"
           ></easy-loadimage>
           <!-- <text>{{ item.tag[index] }}</text> -->
         </view>
@@ -77,7 +78,7 @@ export default {
     return {
       // 获取首页推荐图片参数
       recommendPrams: {
-        limit: 6,
+        limit: 15,
         order: "hot",
         skip: 0,
       },
@@ -89,6 +90,8 @@ export default {
       date: {},
       // 热门推荐
       vertical: [],
+      // 是否还有更多数据
+      hasMore: true,
     };
   },
 
@@ -104,10 +107,16 @@ export default {
     // 获取首页推荐图片函数
     getRecommendData(data) {
       getRecommend(data).then((res) => {
-        // 将推荐、月份、热门等数据保存
-        this.recommend = res.homepage[1].items;
-        this.moment = res.homepage[2].items;
-        this.vertical = res.vertical;
+        if (res.vertical.length === 0) {
+          this.hasMore = false;
+        }
+        if (this.recommend.length === 0) {
+          // 将推荐、月份、热门等数据保存
+          this.recommend = res.homepage[1].items;
+          this.moment = res.homepage[2].items;
+        }
+
+        this.vertical = [...this.vertical, ...res.vertical];
         console.log(res);
         // console.log(
         //   "推荐:",
@@ -126,19 +135,19 @@ export default {
 <style lang="scss" scoped>
 .home_moment {
   margin-top: 30rpx;
-  .moment_title {
+  .moment_title_content {
     height: 70rpx;
-    padding: 0 20rpx;
+    padding: 0 10rpx;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-weight: 600;
-    .moment_title_text {
+    .moment_title_date {
       display: flex;
       align-items: center;
       font-size: 34rpx;
       color: $color;
-      .moment_title_date {
+      .moment_title_date_month {
         text {
           font-size: 30rpx;
         }
@@ -163,13 +172,18 @@ export default {
     background: #fff;
     .moment_content_item {
       width: 49%;
+      // height: 240rpx;
       background: #fff;
       // margin-bottom: 80rpx;
-      margin-bottom: 10rpx;
+      // margin-bottom: 10rpx;
       border-radius: 20rpx;
     }
   }
 }
+// .moment_content_item ::v-deep .loadfail-img,
+// .moment_content_item ::v-deep .loading-img {
+//   height: 360rpx;
+// }
 .vertical {
   .vertical_title {
     color: $color;
@@ -184,7 +198,8 @@ export default {
     padding: 10rpx;
     background: #fff;
     .vertical_content_item {
-      width: 32%;
+      width: 32.5%;
+      height: 360rpx;
       background: #fff;
       // margin-bottom: 80rpx;
       margin-bottom: 10rpx;

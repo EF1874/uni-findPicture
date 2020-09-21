@@ -198,14 +198,17 @@ image.origin-img.no-transition {
 
 .easy-loadimage {
   width: 100%;
-  /* height: 500rpx; */
-  /* margin-bottom: 38rpx; */
+  height: 100%;
+  margin-bottom: 10rpx;
 }
 .origin-img {
+  height: 100%;
   border-radius: 20rpx;
 }
 .loadfail-img,
 .loading-img {
-  height: 360rpx;
+  /* height: 360rpx; */
+  border-radius: 20rpx;
+
 }
 </style>
