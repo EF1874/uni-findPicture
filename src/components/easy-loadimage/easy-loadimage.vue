@@ -202,7 +202,7 @@ image.origin-img.no-transition {
   margin-bottom: 10rpx;
 }
 .origin-img {
-  height: 100%;
+  width: 100%;
   border-radius: 20rpx;
 }
 .loadfail-img,

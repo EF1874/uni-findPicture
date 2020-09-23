@@ -88,6 +88,10 @@ export default {
     setTimeout(() => {
       switch (this.current) {
         case 0:
+          // 清空旧数据
+          this.$refs.recommend.recommend = [];
+          this.$refs.recommend.moment = [];
+          this.$refs.recommend.vertical = [];
           // 更新推荐数据
           this.$refs.recommend.getRecommendData(
             this.$refs.recommend.recommendPrams

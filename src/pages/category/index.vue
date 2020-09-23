@@ -21,14 +21,14 @@
           <view class="vertical_content">
             <view
               class="vertical_content_item"
-              v-for="item of verticalNew"
-              :key="item.id"
+              @tap="clickPic(index1, verticalNew)"
+              v-for="(item1, index1) of verticalNew"
+              :key="item1.id"
             >
               <easy-loadimage
                 mode="widthFix"
                 :scroll-top="scrollTop"
-                :image-src="item.thumb"
-                loading-mode="spin-circle looming-gray"
+                :image-src="item1.thumb"
               ></easy-loadimage>
               <!-- <text>{{ item.tag[index] }}</text> -->
             </view>
@@ -39,14 +39,14 @@
           <view class="vertical_content">
             <view
               class="vertical_content_item"
-              v-for="item of verticalHot"
-              :key="item.id"
+              @tap="clickPic(index2, verticalHot)"
+              v-for="(item2, index2) of verticalHot"
+              :key="item2.id"
             >
               <easy-loadimage
                 mode="widthFix"
                 :scroll-top="scrollTop"
-                :image-src="item.thumb"
-                loading-mode="spin-circle looming-gray"
+                :image-src="item2.thumb"
               ></easy-loadimage>
               <!-- <text>{{ item.tag[index] }}</text> -->
             </view>
@@ -72,12 +72,13 @@ export default {
       items: ["最新", "热门"],
       // tab选中索引
       current: 0,
-      // 获取详细分类图片列表参数
+      // 获取分类最新图片
       catePramsNew: {
         limit: 15,
         skip: 0,
         order: "new",
       },
+      // 获取分类热门图片
       catePramsHot: {
         limit: 15,
         skip: 0,
@@ -101,7 +102,12 @@ export default {
     this.id = e.id;
     console.log(this.id, this.catePramsNew);
     // 按分类获取图片列表
-    this.getPicNew(this.id, this.catePramsNew);
+    this.getPic(this.id, this.catePramsNew);
+    this.getPic(this.id, this.catePramsHot);
+  },
+  destroyed() {
+    uni.removeStorageSync("currentImgIndex");
+    uni.removeStorageSync("imgPreviewPicList");
   },
   // 函数
   methods: {
@@ -110,37 +116,31 @@ export default {
       if (this.current !== e.currentIndex) {
         // 修改点击的tab索引
         this.current = e.currentIndex;
-        // 判断点击的是热门还是最新，并获取数据
-        switch (this.current) {
-          case 0:
-            this.getPicNew(this.id, this.catePramsNew);
-            break;
-          case 1:
-            this.getPicHot(this.id, this.catePramsHot);
-            break;
-        }
       }
-      console.log(this.catePrams);
+      
+      // this.current === 0
+      //   ? this.verticalNew = [] && this.getPic(this.id, this.catePramsNew)
+      //   : this.verticalHot = [] && this.getPic(this.id, this.catePramsHot);
     },
     // 按分类获取图片
-    getPicNew(id, parms) {
+    getPic(id, parms) {
       getCategoryPic(id, parms).then((res) => {
-        if (res.vertical.length === 0) {
-          this.hasMore = false;
-        }
-        console.log(res);
-        this.verticalNew = [...this.verticalNew, ...res.vertical];
-        console.log(this.verticalNew);
+        // 判断返回的更多数据是否为空，为空则表示没有更多
+        res.vertical.length === 0
+          ? (this.hasMore = false)
+          : (this.hasMore = true);
+        // 判断请求参数是否为new，是则获取最新列表，否则获取热门列表
+        parms.order === "new"
+          ? (this.verticalNew = [...this.verticalNew, ...res.vertical])
+          : (this.verticalHot = [...this.verticalHot, ...res.vertical]);
       });
     },
-    getPicHot(id, parms) {
-      getCategoryPic(id, parms).then((res) => {
-        if (res.vertical.length === 0) {
-          this.hasMore = false;
-        }
-        console.log(res);
-        this.verticalHot = [...this.verticalHot, ...res.vertical];
-        console.log(this.verticalNew);
+     // 点击图片的时候，将图片和索引存起来，并跳转到大图预览界面
+    clickPic(index, moment) {
+      uni.setStorageSync("imgPreviewPicList", moment);
+      uni.setStorageSync("currentImgIndex", index);
+      uni.navigateTo({
+        url: `/pages/imgPreview/imgPreview?id=${moment[index].id}`,
       });
     },
   },
@@ -150,25 +150,39 @@ export default {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this.scrollTop = scrollTop;
+      console.log("滚动事件");
     }, 500);
   },
   // 上拉触底事件
   onReachBottom() {
-    // switch (this.current) {
-    //   case 0:
-    //     if (!this.hasMore) {
-    //       uni.showToast({
-    //         title: "好像没有数据哦~",
-    //         duration: 2000,
-    //         icon: "none",
-    //       });
-    //     } else {
-    //       let catePrams = this.catePrams;
-    //       catePrams.skip += catePrams.limit;
-    //       this.getPic(this.id, catePrams);
-    //       console.log(catePrams);
-    //     }
-    // }
+    let timer = null;
+    clearTimeout(timer);
+    // 设置防抖防止不断触发触底事件
+    timer = setTimeout(() => {
+      // 判断是否有更多数据
+      if (!this.hasMore) {
+        uni.showToast({
+          title: "好像没有图片了哦~",
+          duration: 2000,
+          icon: "none",
+        });
+      }
+      // 判断当前是最新还是热门列表
+      switch (this.current) {
+        case 0:
+          let catePramsNew = this.catePramsNew;
+          catePramsNew.skip += catePramsNew.limit;
+          this.getPic(this.id, catePramsNew);
+          console.log("最新列表触底事件", this.current);
+          break;
+        case 1:
+          let catePramsHot = this.catePramsHot;
+          catePramsHot.skip += catePramsHot.limit;
+          this.getPic(this.id, catePramsHot);
+          console.log("热门列表触底事件", this.current);
+          break;
+      }
+    }, 500);
   },
 };
 </script>
@@ -204,11 +218,11 @@ export default {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  padding: 20rpx;
+  padding: 10rpx;
   background: #fff;
   .vertical_content_item {
     width: 32.5%;
-    height: 360rpx;
+    height: 370rpx;
     background: #fff;
     // margin-bottom: 80rpx;
     margin-bottom: 10rpx;

@@ -15,6 +15,7 @@
         previousMargin="120"
         nextMargin="120"
         imgRadius="5"
+        @click-item = "clickItem"
       />
     </view>
     <!-- 每日推荐区域 -->
@@ -31,11 +32,17 @@
       </view>
       <!-- 图片 -->
       <view class="moment_content">
-        <view class="moment_content_item" v-for="item of moment" :key="item.id">
+        <view
+          class="moment_content_item"
+          @tap="clickPic(index, moment)"
+          v-for="(item, index) of moment"
+          :key="item.id"
+        >
           <easy-loadimage
-            mode="widthFix"
+            mode="aspectFill"
             :scroll-top="scrollTop"
             :image-src="item.thumb + item.rule.replace('$<Height>', 240)"
+            loading-mode="spin-circle looming-gray"
           ></easy-loadimage>
           <!-- <text>{{ item.tag[index] }}</text> -->
         </view>
@@ -47,7 +54,8 @@
       <view class="vertical_content">
         <view
           class="vertical_content_item"
-          v-for="item of vertical"
+          @tap="clickPic(index, vertical)"
+          v-for="(item, index) of vertical"
           :key="item.id"
         >
           <easy-loadimage
@@ -102,6 +110,12 @@ export default {
     this.date.MM = moment().format("MM");
     this.date.DD = moment().format("DD");
     // console.log("时间戳", this.moment);
+    // 将图片缓存
+  },
+  // 销毁
+  destroyed() {
+    uni.removeStorageSync("currentImgIndex");
+    uni.removeStorageSync("imgPreviewPicList");
   },
   methods: {
     // 获取首页推荐图片函数
@@ -118,14 +132,20 @@ export default {
 
         this.vertical = [...this.vertical, ...res.vertical];
         console.log(res);
-        // console.log(
-        //   "推荐:",
-        //   this.recommend,
-        //   "月份：",
-        //   this.moment,
-        //   "热门 ",
-        //   this.vertical
-        // );
+      });
+    },
+    // 点击轮播图图片事件
+    clickItem(e) {
+      uni.navigateTo({
+        url: `/pages/albumDetail/index?id=${e.target}`,
+      });
+    },
+    // 点击列表图片的时候，将图片和索引存起来，并跳转到大图预览界面
+    clickPic(index, moment) {
+      uni.setStorageSync("imgPreviewPicList", moment);
+      uni.setStorageSync("currentImgIndex", index);
+      uni.navigateTo({
+        url: `/pages/imgPreview/imgPreview?id=${moment[index].id}`,
       });
     },
   },
@@ -172,11 +192,14 @@ export default {
     background: #fff;
     .moment_content_item {
       width: 49%;
-      // height: 240rpx;
+      height: 240rpx;
       background: #fff;
       // margin-bottom: 80rpx;
-      // margin-bottom: 10rpx;
+      margin-bottom: 10rpx;
       border-radius: 20rpx;
+      image {
+        height: 240rpx;
+      }
     }
   }
 }
