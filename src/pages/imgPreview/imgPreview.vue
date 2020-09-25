@@ -42,11 +42,18 @@
               >
             </view>
           </view>
-          <view
+          <!-- <view
             class="bg_img"
-            :style="{ backgroundImage: 'url(' + x.img + ')' }"
+            :style="{ backgroundImage: 'url(' + x.preview + ')' }"
             @click="clickPic(y)"
-          ></view>
+          ></view> -->
+          <image
+            mode="widthFix"
+            class="bg_img"
+            @click="clickPic(y)"
+            :src="x.preview"
+            lazy-load
+          ></image>
         </swiper-item>
       </swiper>
     </view>
@@ -131,6 +138,8 @@ export default {
     width: 100%;
     height: 100vh;
     .author_wrap {
+      z-index: 100;
+
       color: #fff;
       display: flex;
       position: absolute;
@@ -156,6 +165,8 @@ export default {
       }
     }
     .pic_icon_wrap {
+      z-index: 100;
+
       width: 100%;
       height: 120rpx;
       display: flex;
@@ -183,9 +194,12 @@ export default {
       }
     }
     .bg_img {
-      background-size: 100% auto;
-      background-repeat: no-repeat;
-      background-position: center;
+      // background-size: 100% auto;
+      // background-repeat: no-repeat;
+      // background-position: center;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
       width: 100%;
       height: 100%;
     }
