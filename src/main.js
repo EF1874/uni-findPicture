@@ -1,11 +1,18 @@
-import Vue from 'vue'
-import App from './App'
+import Vue from "vue";
+import App from "./App";
 
-Vue.config.productionTip = false
+import * as filters from "./utils/filters";
 
-App.mpType = 'app'
+Object.keys(filters).forEach((key) => {
+  // console.log(filters[key]);
+  Vue.filter(key, filters[key]);
+});
+
+Vue.config.productionTip = false;
+
+App.mpType = "app";
 
 const app = new Vue({
-  ...App
-})
-app.$mount()
+  ...App,
+});
+app.$mount();

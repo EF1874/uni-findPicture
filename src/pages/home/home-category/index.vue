@@ -6,7 +6,10 @@
         v-for="item in category"
         :key="item.id"
         :url="'/pages/category/index?id=' + item.id"
-        ><image mode="widthFix" :src="item.cover" /><text>{{
+        ><easy-loadimage mode="widthFix" 
+        :scroll-top="scrollTop"
+        :image-src="item.cover"
+        loading-mode="looming-gray" /><text>{{
           item.name
         }}</text></navigator
       >
@@ -16,12 +19,12 @@
 
 <script>
 import { getCategory } from "@/API/getCategory";
-// import easyLoadimage from "@/components/easy-loadimage/easy-loadimage.vue";
+import easyLoadimage from "@/components/easy-loadimage/easy-loadimage.vue";
 export default {
-  // components: { easyLoadimage },
-  // props: {
-  //   scrollTop: Number,
-  // },
+  components: { easyLoadimage },
+  props: {
+    scrollTop: Number,
+  },
   data() {
     return {
       category: [],
@@ -63,6 +66,7 @@ export default {
   .cate_content {
     width: 32.3%;
     position: relative;
+    margin-bottom: 10rpx;
     // margin-left: 10rpx;
     image {
       border-radius: 10rpx;

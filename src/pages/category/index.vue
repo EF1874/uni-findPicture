@@ -105,10 +105,7 @@ export default {
     this.getPic(this.id, this.catePramsNew);
     this.getPic(this.id, this.catePramsHot);
   },
-  destroyed() {
-    uni.removeStorageSync("currentImgIndex");
-    uni.removeStorageSync("imgPreviewPicList");
-  },
+
   // 函数
   methods: {
     // tabs栏点击事件

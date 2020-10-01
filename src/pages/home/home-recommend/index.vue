@@ -42,7 +42,7 @@
             mode="aspectFill"
             :scroll-top="scrollTop"
             :image-src="item.thumb + item.rule.replace('$<Height>', 240)"
-            loading-mode="spin-circle looming-gray"
+            loading-mode=" looming-gray"
           ></easy-loadimage>
           <!-- <text>{{ item.tag[index] }}</text> -->
         </view>
@@ -62,7 +62,7 @@
             mode="heightFix"
             :scroll-top="scrollTop"
             :image-src="item.thumb"
-            loading-mode="spin-circle looming-gray"
+            loading-mode="looming-gray"
           ></easy-loadimage>
           <!-- <text>{{ item.tag[index] }}</text> -->
         </view>

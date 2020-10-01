@@ -14,12 +14,17 @@
             >
             </uni-segmented-control>
           </view>
-          <view class="iconfont iconsearch"></view>
+          <view class="iconfont icon-search"></view>
         </view>
       </view>
 
       <!-- 内容区 -->
-      <view class="content">
+      <view
+        class="content"
+        @touchmove="handleTouchmove"
+        @touchstart="handleTouchStart"
+        @touchend="handleTouchEnd"
+      >
         <view v-if="current === 0">
           <home-recommend
             ref="recommend"
@@ -51,6 +56,7 @@ export default {
     homeNew,
     homeAlbum,
   },
+
   data() {
     return {
       // tab栏数据
@@ -61,6 +67,9 @@ export default {
       scrollTop: 0,
       // hotLength: 0,
       timer: null,
+      // 屏幕坐标
+      touchS: [0, 0],
+      touchE: [0, 0],
     };
   },
   onLoad() {},
@@ -72,12 +81,44 @@ export default {
         this.current = e.currentIndex;
       }
     },
+    // 滑动屏幕事件
+    handleTouchmove(e) {
+      // 在 touchMove 方法中持续监听触摸点的位置（x, y
+      let sx = e.touches[0].pageX;
+      let sy = e.touches[0].pageY;
+      this.touchE = [sx, sy];
+    },
+    // 滑动开始
+    handleTouchStart(e) {
+      // touchstart 时，监听到触摸开始时的 （x, y）位置
+      let sx = e.touches[0].pageX;
+      let sy = e.touches[0].pageY;
+      this.touchS = [sx, sy];
+    },
+    // 滑动结束
+    handleTouchEnd(e) {
+      // 在 touchEnd 方法中对开始的触摸位置和结束的触摸位置进行判断，如果移动距离大于 50 则判定为发生触摸滑动事件。
+      let start = this.touchS;
+      let end = this.touchE;
+      console.log(start);
+      console.log(end);
+      if (start[0] < end[0] - 50) {
+        console.log("右滑");
+        // 右滑时修改tab索引
+        this.current === 2 ? (this.current = 0) : this.current++;
+      } else if (start[0] > end[0] + 50) {
+        console.log("左滑");
+        // 左右滑时修改tab索引
+        this.current === 0 ? (this.current = 2) : this.current--;
+      } else {
+        console.log("静止");
+      }
+    },
   },
   onPageScroll({ scrollTop }) {
     // 传入scrollTop值并触发所有easy-loadimage组件下的滚动监听事件
-
     clearTimeout(this.timer);
-
+    // 保存屏幕滚动高度
     this.timer = setTimeout(() => {
       this.scrollTop = scrollTop;
     }, 500);
@@ -124,8 +165,7 @@ export default {
             });
           }
           break;
-          case 2:
-
+        case 2:
       }
       console.log("recommend组件上拉触底事件触发");
     }, 500);
@@ -151,7 +191,7 @@ export default {
         height: 100%;
         margin: 0 auto;
       }
-      .iconsearch {
+      .icon-search {
         position: absolute;
         right: 5%;
         top: 50%;
