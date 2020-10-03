@@ -21,7 +21,7 @@
       <!-- 内容区 -->
       <view
         class="content"
-        @touchmove="handleTouchmove"
+        @touchmove="handleTouchMove"
         @touchstart="handleTouchStart"
         @touchend="handleTouchEnd"
       >
@@ -81,34 +81,38 @@ export default {
         this.current = e.currentIndex;
       }
     },
-    // 滑动屏幕事件
-    handleTouchmove(e) {
-      // 在 touchMove 方法中持续监听触摸点的位置（x, y
-      let sx = e.touches[0].pageX;
-      let sy = e.touches[0].pageY;
-      this.touchE = [sx, sy];
-    },
     // 滑动开始
     handleTouchStart(e) {
       // touchstart 时，监听到触摸开始时的 （x, y）位置
       let sx = e.touches[0].pageX;
       let sy = e.touches[0].pageY;
       this.touchS = [sx, sy];
+      this.touchE = [sx, sy];
+      console.log("Start", this.touchS);
+    },
+    // 滑动屏幕事件
+    handleTouchMove(e) {
+      // 在 touchMove 方法中持续监听触摸点的位置（x, y
+      let sx = e.touches[0].pageX;
+      let sy = e.touches[0].pageY;
+      this.touchE = [sx, sy];
+      console.log("end", this.touchE);
     },
     // 滑动结束
     handleTouchEnd(e) {
       // 在 touchEnd 方法中对开始的触摸位置和结束的触摸位置进行判断，如果移动距离大于 50 则判定为发生触摸滑动事件。
+      console.log("event", this.touchS, this.touchE);
       let start = this.touchS;
       let end = this.touchE;
-      console.log(start);
-      console.log(end);
+      // console.log(start);
+      // console.log(end);
       if (start[0] < end[0] - 50) {
         console.log("右滑");
         // 右滑时修改tab索引
         this.current === 2 ? (this.current = 0) : this.current++;
       } else if (start[0] > end[0] + 50) {
         console.log("左滑");
-        // 左右滑时修改tab索引
+        // 左滑时修改tab索引
         this.current === 0 ? (this.current = 2) : this.current--;
       } else {
         console.log("静止");

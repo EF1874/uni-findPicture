@@ -67,6 +67,7 @@
             @click="clickPic"
             :src="x.preview"
             lazy-load
+            @longpress="handleLongpress"
           ></image>
         </swiper-item>
       </swiper>
@@ -128,9 +129,11 @@
 
 <script>
 import { getComment } from "@/API/getComment";
+import { longPressSave } from "@/utils/longPressSave";
 export default {
   data() {
     return {
+      // 图片列表
       picList: [],
       indicatorDots: false,
       autoplay: false,
@@ -173,7 +176,7 @@ export default {
       // this.current = index;
       this.isShowSwiper = !this.isShowSwiper;
     },
-    // 保存图片列表
+    // 缓存图片列表
     async picListInit() {
       this.current = uni.getStorageSync("currentImgIndex");
       this.picList = uni.getStorageSync("imgPreviewPicList");
@@ -209,6 +212,11 @@ export default {
         title: "微信小程序分享",
         path: "/pages/home/index",
       };
+    },
+    // 图片长按事件
+    handleLongpress(e) {
+      console.log("长按图片事件", e);
+      longPressSave(this.picList[this.current].img);
     },
   },
 };
@@ -288,7 +296,7 @@ export default {
       align-items: center;
       button {
         color: #fff;
-        background-color:transparent;
+        background-color: transparent;
         // font-weight: 100;
         font-size: 50rpx;
       }
